@@ -1,16 +1,17 @@
 # MediaPipeSwiftTask
 
-A Swift wrapper for Google's MediaPipe GenAI tasks that provides a clean, type-safe API with automatic framework linking and graceful fallbacks for all iOS environments including Simulator and Xcode Previews.
+A Swift wrapper for Google's MediaPipe GenAI tasks that provides type-safe APIs with automatic framework linking and graceful fallbacks for all iOS environments including Simulator and Xcode Previews.
 
 ## Features
 
-✅ **Zero Configuration** - No manual framework linking required  
+✅ **Zero Configuration** - Frameworks automatically downloaded from GitHub releases  
 ✅ **Universal Compatibility** - Works on device, simulator, and Xcode Previews  
 ✅ **Type-Safe API** - Clean Swift interfaces that mirror MediaPipe functionality  
 ✅ **Graceful Fallbacks** - Handles unsupported environments automatically  
 ✅ **Session Management** - Stateful conversations with memory  
 ✅ **Vision Support** - Process text and images together  
 ✅ **Async/Await** - Modern Swift concurrency support  
+✅ **CI/CD Ready** - Automated framework releases via GitHub Actions  
 
 ## Installation
 
@@ -20,23 +21,24 @@ Add MediaPipeSwiftTask to your project:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/yourusername/MediaPipeSwiftTask.git", from: "1.0.0")
+    .package(url: "https://github.com/jasval/MediaPipeSwiftTask.git", from: "1.0.0")
 ]
 ```
 
-### Setup
+Or add it through Xcode:
+1. File → Add Package Dependencies
+2. Enter: `https://github.com/jasval/MediaPipeSwiftTask.git`
+3. Select version `1.0.0` or later
 
-1. **Add MediaPipe Frameworks**: Place your MediaPipe frameworks in the `Pods/` directory:
-   ```
-   Pods/
-   ├── MediaPipeTasksGenAI/frameworks/MediaPipeTasksGenAI.xcframework
-   └── MediaPipeTasksGenAIC/frameworks/MediaPipeTasksGenAIC.xcframework
-   ```
+### No Setup Required! 🎉
 
-2. **Import the Package**:
-   ```swift
-   import MediaPipeSwiftTask
-   ```
+The MediaPipe frameworks are automatically downloaded from GitHub releases when you add the package. No manual framework management needed.
+
+### Import and Use
+
+```swift
+import MediaPipeSwiftTask
+```
 
 ## Quick Start
 
@@ -235,10 +237,26 @@ struct ContentView: View {
 
 ## Requirements
 
-- iOS 15.0+ / macOS 12.0+
-- Xcode 14.0+
+- iOS 17.0+
+- Xcode 15.0+
 - Swift 5.9+
-- MediaPipe GenAI frameworks
+- MediaPipe GenAI frameworks (automatically included)
+
+## Architecture
+
+This package uses an innovative approach to distribute large MediaPipe frameworks:
+
+- **GitHub Actions** automatically build and package frameworks on each release
+- **Remote Binary Targets** in Package.swift reference framework zips from GitHub releases
+- **Graceful Platform Detection** ensures code works everywhere, even when MediaPipe isn't supported
+- **Conditional Compilation** prevents crashes in unsupported environments
+
+## Releases
+
+Framework releases are automated via GitHub Actions. Each release includes:
+- Pre-built MediaPipe xcframeworks
+- SHA-256 checksums for security
+- Automatic SPM integration
 
 ## License
 
