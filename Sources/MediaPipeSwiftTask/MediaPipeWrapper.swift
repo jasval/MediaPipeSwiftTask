@@ -31,6 +31,7 @@ public class LlmInferenceWrapper {
         do {
             self.llmInference = try LlmInference(modelPath: modelPath)
         } catch {
+            print("MediaPipe LlmInference initialization failed: \(error)")
             throw MediaPipeError.initializationFailed
         }
         #else
@@ -48,6 +49,7 @@ public class LlmInferenceWrapper {
             llmOptions.waitForWeightUploads = options.waitForWeightUploads
             self.llmInference = try LlmInference(options: llmOptions)
         } catch {
+            print("MediaPipe LlmInference initialization with options failed: \(error)")
             throw MediaPipeError.initializationFailed
         }
         #else
