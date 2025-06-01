@@ -32,6 +32,12 @@ public class LlmInferenceWrapper {
             self.llmInference = try LlmInference(modelPath: modelPath)
         } catch {
             print("MediaPipe LlmInference initialization failed: \(error)")
+            print("Error details: \(String(describing: error))")
+            if let nsError = error as NSError? {
+                print("Error domain: \(nsError.domain)")
+                print("Error code: \(nsError.code)")
+                print("Error userInfo: \(nsError.userInfo)")
+            }
             throw MediaPipeError.initializationFailed
         }
         #else
@@ -50,6 +56,12 @@ public class LlmInferenceWrapper {
             self.llmInference = try LlmInference(options: llmOptions)
         } catch {
             print("MediaPipe LlmInference initialization with options failed: \(error)")
+            print("Error details: \(String(describing: error))")
+            if let nsError = error as NSError? {
+                print("Error domain: \(nsError.domain)")
+                print("Error code: \(nsError.code)")
+                print("Error userInfo: \(nsError.userInfo)")
+            }
             throw MediaPipeError.initializationFailed
         }
         #else
