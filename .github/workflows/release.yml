@@ -1,0 +1,81 @@
+name: Release MediaPipe Frameworks
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Tag name for release'
+        required: true
+        type: string
+
+jobs:
+  release:
+    runs-on: macos-latest
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      
+    - name: Setup CocoaPods
+      run: |
+        sudo gem install cocoapods
+        pod install
+        
+    - name: Prepare frameworks
+      run: |
+        # Copy frameworks from Pods to a staging area
+        mkdir -p staging
+        cp -r Pods/MediaPipeTasksGenAI/frameworks/MediaPipeTasksGenAI.xcframework staging/
+        cp -r Pods/MediaPipeTasksGenAIC/frameworks/MediaPipeTasksGenAIC.xcframework staging/
+        
+    - name: Create framework archives
+      run: |
+        cd staging
+        zip -r MediaPipeTasksGenAI.xcframework.zip MediaPipeTasksGenAI.xcframework
+        zip -r MediaPipeTasksGenAIC.xcframework.zip MediaPipeTasksGenAIC.xcframework
+        
+        # Generate checksums
+        shasum -a 256 MediaPipeTasksGenAI.xcframework.zip > MediaPipeTasksGenAI.checksum
+        shasum -a 256 MediaPipeTasksGenAIC.xcframework.zip > MediaPipeTasksGenAIC.checksum
+        
+        echo "MediaPipeTasksGenAI checksum:"
+        cat MediaPipeTasksGenAI.checksum
+        echo "MediaPipeTasksGenAIC checksum:"
+        cat MediaPipeTasksGenAIC.checksum
+        
+    - name: Get tag name
+      id: tag
+      run: |
+        if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          echo "tag_name=${{ github.event.inputs.tag_name }}" >> $GITHUB_OUTPUT
+        else
+          echo "tag_name=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+        fi
+        
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ steps.tag.outputs.tag_name }}
+        name: Release ${{ steps.tag.outputs.tag_name }}
+        body: |
+          MediaPipe Swift Task Framework Release
+          
+          This release contains the MediaPipe xcframeworks for Swift Package Manager.
+          
+          **Checksums:**
+          
+          MediaPipeTasksGenAI: `$(cat staging/MediaPipeTasksGenAI.checksum | cut -d' ' -f1)`
+          MediaPipeTasksGenAIC: `$(cat staging/MediaPipeTasksGenAIC.checksum | cut -d' ' -f1)`
+          
+        files: |
+          staging/MediaPipeTasksGenAI.xcframework.zip
+          staging/MediaPipeTasksGenAIC.xcframework.zip
+          staging/MediaPipeTasksGenAI.checksum
+          staging/MediaPipeTasksGenAIC.checksum
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
